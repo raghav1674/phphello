@@ -1,0 +1,39 @@
+---
+# tasks file for raghav1674.phphello
+- name: Make sure the all packages are installed
+  yum:
+    name: 
+    - httpd 
+    - php
+    - firewalld  
+    state: present 
+
+
+
+- name: Make sure to install content files in document root 
+  copy:
+    content: "{{ item.Content }}"
+    dest: "{{ item.filePath }}"
+  loop:
+  - { filePath: "/var/www/html/index.html" , Content: "Welcome to {{ ansible_fqdn }} on {{ ansible_default_ipv4.address }}" } 
+  - { filePath: "/var/www/html/hello.html" , Content: "Hello PHP World from {{ ansible_fqdn }}" }
+
+
+- name: Make sure httpd service is running and is enabled 
+  service:
+    name: "{{ item }}"
+    state: started 
+    enabled: true 
+  loop:
+  - firewalld
+  - httpd
+
+
+- name: Allow http service in firewall
+  firewalld:
+     service: http
+     state: enabled 
+     immediate: true
+     permanent: true 
+
+
